@@ -10,27 +10,26 @@ import Error_Messages
 
 from flask import Flask, request
 
-def create_block(type, id_list, url_list):
+
+def create_block(type):
     if type == "button":
         result = ""
-        result =[
-                    {
-                        "type": "section",
-                        "text": {
-                            "type": "mrkdwn",
-                            "text": "Choose a link"
-                        }
-                    },
-                    button_block(id_list, url_list)
-    ]
+        result = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "mrkdwn",
+                    "text": "Choose a link"
+                }
+            }
+        ]
         return result
 
 
 def button_block(id, url):
-    result = ""
-    result = {
+    return [
+            {
                 "type": "actions",
-                "block_id": id,
                 "elements": [
                     {
                         "type": "button",
@@ -38,8 +37,11 @@ def button_block(id, url):
                             "type": "plain_text",
                             "text": id
                         },
-                        "url": url
+                        "value": id,
+                        "url": url,
+                        "action_id": "actionId-0"
                     }
                 ]
             }
-    return result
+        ]
+

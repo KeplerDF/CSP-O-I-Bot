@@ -1,5 +1,6 @@
 import logging
 import os
+import time
 from typing import List, Any
 
 from slack_sdk import WebClient
@@ -27,6 +28,11 @@ def incoming_slack_options():
     return 'ok'
 
 
+slack_token = os.environ["SLACK_BOT_TOKEN"]
+ssl_context = ssl.create_default_context(cafile=certifi.where())
+client = WebClient(token=slack_token, ssl=ssl_context)
+
+
 def run():
     try:
         f = open("SlackActive.txt", "x")
@@ -41,40 +47,62 @@ def run():
     except:
         print(Error_Messages.process_error(3))
 
-    slack_token = os.environ["SLACK_BOT_TOKEN"]
-    ssl_context = ssl.create_default_context(cafile=certifi.where())
-    client = WebClient(token=slack_token, ssl=ssl_context)
 
-    x = [""]
-    y = [""]
+
+    x = []
+    y = []
 
     f = open("SlackActive.txt", "r")
     channel = f.readline()
     x = channel.split(", ")
     f.close()
 
-    idlist = "O+I"
-    urllist = "https://confluence.workday.com/display/ADOPT/CSP%3A+Observability+and+Insights+%28prev.+Product+Adoption%29+Home+Page"
+    idlist = ["O+I", "Slackbot Demo"]
+    urllist = ["https://confluence.workday.com/display/ADOPT/CSP%3A+Observability+and+Insights+%28prev.+Product+Adoption%29+Home+Page", "https://docs.google.com/presentation/d/1IHx06KGax56RJjBaYoDeWRU4A7umHhFOAWZkJpPU37A/edit#slide=id.g287a19790da_0_73"]
 
-    '''''
+    ''''
     f2 = open("KeywordMap.txt", "r")
     channel2 = f2.readline()
-    for n in f2:
-        y += channel2
+    
+    y.append(idlist)
+    y.append(urllist)
+
 
     f2.close()
     '''''
 
     try:
         response = client.chat_postMessage(
-            channel=x[0],
-            blocks=block_Creator.create_block("button", idlist, urllist),
-            text="Hello I am O&I Bot " "\n"
+            channel="C059ZLLFFHB",
+            blocks=block_Creator.create_block("button")
         )
 
     except SlackApiError as e:
         # You will get a SlackApiError if "ok" is False
         assert e.response[Error_Messages.process_error(0)]  # str like 'invalid_auth', 'channel_not_found'
+    append_button(idlist, urllist)
+
+     # str like 'invalid_auth', 'channel_not_found'
+
+
+
+def append_button(ids, urls):
+    i = 0
+    while i < len(ids):
+        id = ids[i]
+        url = urls[i]
+        i = i + 1
+        try:
+            response = client.chat_postMessage(
+                channel="C059ZLLFFHB",
+                blocks=block_Creator.button_block(id, url)
+            )
+
+        except SlackApiError as e:
+            # You will get a SlackApiError if "ok" is False
+            assert e.response[Error_Messages.process_error(0)]
+
+
 
 
 # Press the green button in the gutter to run the script.
